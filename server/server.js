@@ -14,8 +14,7 @@ app.use(cookieParser())
 
 app.use(cors({
     origin: function (origin, callback) {
-        // Allow all origins — production pe safe hai kyunki
-        // credentials + httpOnly cookies se security handle hoti hai
+        // Allow all origins — works for localhost and all Vercel deployments
         callback(null, true)
     },
     credentials: true
