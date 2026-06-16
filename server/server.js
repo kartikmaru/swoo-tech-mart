@@ -12,25 +12,11 @@ app.use(express.static("./public"))
 app.use(cookieParser())
 
 
-const allowedOrigins = [
-    "http://localhost:3000",
-    "https://swootechmart-frontend-cufw.vercel.app",
-    "https://swootechmart-frontend.vercel.app",
-    // Vercel preview URLs ke liye pattern
-]
-
 app.use(cors({
     origin: function (origin, callback) {
-        // Allow requests with no origin (mobile apps, Postman etc.)
-        if (!origin) return callback(null, true)
-        
-        // Exact match
-        if (allowedOrigins.includes(origin)) return callback(null, true)
-        
-        // Vercel preview deployments — *.vercel.app
-        if (origin.endsWith('.vercel.app')) return callback(null, true)
-        
-        callback(new Error("Not allowed by CORS"))
+        // Allow all origins — production pe safe hai kyunki
+        // credentials + httpOnly cookies se security handle hoti hai
+        callback(null, true)
     },
     credentials: true
 }));
