@@ -61,11 +61,13 @@ const Login = async (req, res) => {
         }
         const token = generateToken(user._id)
 
+        const isProduction = process.env.NODE_ENV === 'production'
+
         res.cookie('jwt', token, {
             maxAge: 30 * 24 * 60 * 60 * 1000, // 30 Days
             httpOnly: true,
-            secure: false,   // recommended for production
-            sameSite: 'Strict'
+            secure: isProduction,           // true on HTTPS (Render), false on localhost
+            sameSite: isProduction ? 'None' : 'Lax'  // None for cross-origin HTTPS, Lax for local
         });
 
         sendSuccess(res, {
@@ -150,14 +152,64 @@ const logout = (req, res) => {
 
 }
 
-const address = (req, res) => {
+const delete_addresses = async (req, res) => {
     try {
-       
-    } catch (error) {
-       
-    }
 
+        const userId = req.user._id
+        const { index } = req.body
+
+        const user = await UserModel.findById(userId)
+
+        if (!user) {
+            return notFound(res, "User Not Found")
+        }
+
+        if (index < 0 || index >= user.addresses.length) {
+            return sendBadRequest(res, "Invalid Address Index")
+        }
+
+        user.addresses.splice(index, 1)
+
+        await user.save()
+
+        return sendSuccess(
+            res,
+            user.addresses,
+            {},
+            "Address Deleted Successfully"
+        )
+
+    } catch (error) {
+        return serverError(res, error)
+    }
+}
+
+const addAddresses = async (req, res) => {
+    try {
+        const userId = req.user._id
+        const address = req.body
+
+        const user = await UserModel.findById(userId)
+
+        if (!user) {
+            return notFound(res, "User Not Found")
+        }
+
+        user.addresses.push(address)
+
+        await user.save()
+
+        return sendSuccess(
+            res,
+            user.addresses,
+            {},
+            "Address Added Successfully"
+        )
+
+    } catch (error) {
+        console.log(error)
+    }
 }
 
 
-module.exports = { Register, verifyEmail, resetOtp, Login, getMe, logout, address }
+module.exports = { Register, verifyEmail, resetOtp, Login, getMe, logout, addAddresses, delete_addresses }

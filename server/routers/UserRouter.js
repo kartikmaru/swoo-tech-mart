@@ -1,6 +1,6 @@
 const UserRouter = require("express").Router()
 
-const { Register, verifyEmail, resetOtp, Login, getMe, logout, address } = require("../controller/UserController")
+const { Register, verifyEmail, resetOtp, Login, getMe, logout, addAddresses, delete_addresses } = require("../controller/UserController")
 const { protect } = require("../middleware/auth")
 
 UserRouter.post("/create", Register)
@@ -9,7 +9,8 @@ UserRouter.post("/reset-otp", resetOtp)
 UserRouter.post("/login", Login)
 UserRouter.get("/get", protect, getMe)
 UserRouter.post("/logout", logout)
-UserRouter.post("/address", address)
+UserRouter.post("/addaddresses", protect, addAddresses)
+UserRouter.put("/deleteaddress", protect, delete_addresses)
 
 
 
